@@ -16,13 +16,23 @@ Including another URLconf
 """
 from django.urls import path
 from backend.views import login_view
-from backend.views import register_view
 from backend.views import yolov5_detection
+from backend.views import register_member
+from backend.views import store_image_data
+from backend.views import get_data_by_arduino_id
 
 
 urlpatterns = [
     path('api/login/', login_view, name='login'),
-    path('api/register/', register_view, name='register'),
-    path('api/upload/', yolov5_detection, name='detect')
+  
+    path('api/upload/', yolov5_detection, name='detect'),
+
+
+    path('store_image_data/', store_image_data, name='store_image_data'),
+
+
+    path('register/', register_member, name='register_member'),
+    path('api/getData/<str:arduino_id>/', get_data_by_arduino_id, name='get_data_by_arduino_id'),
+
     # Other URL patterns
 ]

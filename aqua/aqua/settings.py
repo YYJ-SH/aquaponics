@@ -33,6 +33,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'http://192.168.0.199:3000'
 ]
 
 INSTALLED_APPS = [
