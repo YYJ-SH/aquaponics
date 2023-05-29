@@ -10,6 +10,11 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 import backend.yolov5.detect as detect
+import uuid
+from django.conf import settings
+from django.http import HttpResponseBadRequest
+from django.http import HttpResponse
+import paho.mqtt.publish as publish
 
 @api_view(['POST'])
 def yolov5_detection(request):
@@ -25,7 +30,7 @@ def yolov5_detection(request):
         
         
         
-        lst = list(detect.run(source=save_path, weights='C:/Users/esccy/Documents/aquaponics/aqua/backend/yolov5/best.pt'))
+        lst = list(detect.run(source=save_path, weights='C:/Users/esccy/Documents/aquaponics/aqua/backend/yolov5/six.pt'))
         label = lst[0].split()[-1]
         # Perform YOLOv5 detection on the saved image
         label = label.rstrip(',')
@@ -129,3 +134,114 @@ def get_data_by_arduino_id(request, arduino_id):
 
     # Return the serialized data in the response
     return Response(serializer.data)
+@api_view(['POST'])
+def arduinopic_view(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        image_file = request.FILES['image']
+
+        # Generate a unique filename using UUID
+        image_name = str(uuid.uuid4()) + "_" + image_file.name
+        save_path = os.path.join('C:/Users/esccy/Pictures/arduinoWebpics', 'images', image_name)
+
+        # Save the image to the specified directory
+        with open(save_path, 'wb') as file:
+            for chunk in image_file.chunks():
+                file.write(chunk)
+
+        # Create an instance of ImageData and save it to the database
+        image_data = ImageData(
+            arduino_id=request.POST.get('arduino_id'),
+            image_path=os.path.join('images', image_name),
+            sensor1=int(request.POST.get('sensor1')),
+            sensor2=int(request.POST.get('sensor2'))
+        )
+        image_data.save()
+
+        return Response("Image saved successfully.")
+    else:
+        return HttpResponseBadRequest("Invalid request.")
+def led_on(request):
+    # MQTT 브로커 정보
+    mqtt_broker = "mqtt.gabol.kr"
+    mqtt_port = 1883
+    mqtt_topic = "control"
+
+    # MQTT 메시지
+    message = "On"
+
+    # MQTT 메시지 발행
+    publish.single(mqtt_topic, message, hostname=mqtt_broker, port=mqtt_port)
+
+    # HTTP 응답
+    return HttpResponse("LED를 켰습니다.")
+
+def led_off(request):
+    # MQTT 브로커 정보
+    mqtt_broker = "mqtt.gabol.kr"
+    mqtt_port = 1883
+    mqtt_topic = "control"
+
+    # MQTT 메시지
+    message = "Off"
+
+    # MQTT 메시지 발행
+    publish.single(mqtt_topic, message, hostname=mqtt_broker, port=mqtt_port)
+
+    # HTTP 응답
+    return HttpResponse("LED를 껐습니다.")
+def moter_off(request):
+    # MQTT 브로커 정보
+    mqtt_broker = "mqtt.gabol.kr"
+    mqtt_port = 1883
+    mqtt_topic = "control"
+
+    # MQTT 메시지
+    message = "MoterOff"
+
+    # MQTT 메시지 발행
+    publish.single(mqtt_topic, message, hostname=mqtt_broker, port=mqtt_port)
+
+    # HTTP 응답
+    return HttpResponse("모터를 껐습니다.")
+def moter_on(request):
+    # MQTT 브로커 정보
+    mqtt_broker = "mqtt.gabol.kr"
+    mqtt_port = 1883
+    mqtt_topic = "control"
+
+    # MQTT 메시지
+    message = "MoterOn"
+
+    # MQTT 메시지 발행
+    publish.single(mqtt_topic, message, hostname=mqtt_broker, port=mqtt_port)
+
+    # HTTP 응답
+    return HttpResponse("모터를 켰습니다.")
+def moter_once(request):
+    # MQTT 브로커 정보
+    mqtt_broker = "mqtt.gabol.kr"
+    mqtt_port = 1883
+    mqtt_topic = "control"
+
+    # MQTT 메시지
+    message = "MoterOnce"
+
+    # MQTT 메시지 발행
+    publish.single(mqtt_topic, message, hostname=mqtt_broker, port=mqtt_port)
+
+    # HTTP 응답
+    return HttpResponse("모터를 한 번 작동합니다.")
+def dark_neo(request):
+    # MQTT 브로커 정보
+    mqtt_broker = "mqtt.gabol.kr"
+    mqtt_port = 1883
+    mqtt_topic = "control"
+
+    # MQTT 메시지
+    message = "DarkNeo"
+
+    # MQTT 메시지 발행
+    publish.single(mqtt_topic, message, hostname=mqtt_broker, port=mqtt_port)
+
+    # HTTP 응답
+    return HttpResponse("네오픽셀이 어두워졌어요.")

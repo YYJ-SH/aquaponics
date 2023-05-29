@@ -20,16 +20,29 @@ from backend.views import yolov5_detection
 from backend.views import register_member
 from backend.views import store_image_data
 from backend.views import get_data_by_arduino_id
+from backend.views import arduinopic_view
+from backend.views import led_on
+from backend.views import led_off
+from backend.views import moter_off
+from backend.views import moter_on
+from backend.views import moter_once
+from backend.views import dark_neo
 
 
 urlpatterns = [
-    path('api/login/', login_view, name='login'),
+    path('api/login/', login_view, name='login'), 
   
     path('api/upload/', yolov5_detection, name='detect'),
 
 
     path('store_image_data/', store_image_data, name='store_image_data'),
-
+    path('arduinopic', arduinopic_view, name='arduinopic'),
+    path('api/ledon', led_on, name='led_on'),
+    path('api/ledoff', led_off, name='led_off'),
+    path('api/moteroff', moter_off, name='moter_off'),
+    path('api/moteron', moter_on, name='moter_on'),
+    path('api/moteronce', moter_once, name='moter_once'),
+    path('api/darkneo', dark_neo, name='dark_neo'),
 
     path('register/', register_member, name='register_member'),
     path('api/getData/<str:arduino_id>/', get_data_by_arduino_id, name='get_data_by_arduino_id'),
